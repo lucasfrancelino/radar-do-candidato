@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// Remova a linha "use Illuminate\Contracts\Auth\MustVerifyEmail;" se ela existir e não for usada
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
