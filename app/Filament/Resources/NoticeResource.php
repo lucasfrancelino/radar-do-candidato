@@ -61,6 +61,22 @@ class NoticeResource extends Resource
             ]);
     }
 
+    public static function mutateFormDataBeforeCreate(array $data): array
+    {
+        if (isset($data['file_path'])) {
+            $data['file_name'] = basename($data['file_path']);
+        }
+        return $data;
+    }
+
+    public static function mutateFormDataBeforeSave(array $data): array
+    {
+        if (isset($data['file_path'])) {
+            $data['file_name'] = basename($data['file_path']);
+        }
+        return $data;
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -103,6 +119,14 @@ class NoticeResource extends Resource
                     ->boolean(),
             ])
             ->actions([
+                Tables\Actions\Action::make('extract')
+                    ->label('Extrair Disciplinas')
+                    ->icon('heroicon-o-document-arrow-up')
+                    ->url(fn (Notice $record) => \App\Filament\Pages\ExtractSubjects::getUrl(['record' => $record])),
+                Tables\Actions\Action::make('structure')
+                    ->label('Estrutura')
+                    ->icon('heroicon-o-queue-list')
+                    ->url(fn (Notice $record) => \App\Filament\Pages\NoticeStructure::getUrl(['record' => $record])),
                 Tables\Actions\EditAction::make()
                     ->label('Editar'),
                 Tables\Actions\DeleteAction::make()

@@ -14,10 +14,13 @@ class Subject extends Model
     protected $fillable = [
         'name',
         'description',
+        'contents',
+        'category',
         'is_active',
     ];
 
     protected $casts = [
+        'contents' => 'array',
         'is_active' => 'boolean',
     ];
 

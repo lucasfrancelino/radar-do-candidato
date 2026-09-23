@@ -3,7 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\QuestionResource\Pages;
+use App\Models\Notice;
 use App\Models\Question;
+use App\Models\Subject;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -42,6 +44,25 @@ class QuestionResource extends Resource
                     ->searchable()
                     ->preload()
                     ->reactive()
+                    ->rule(function (callable $get) {
+                        return function (string $attribute, $value, \Closure $fail) use ($get) {
+                            $noticeId = $get('notice_id');
+                            if (!$noticeId || !$value) {
+                                return;
+                            }
+
+                            $notice = Notice::find($noticeId);
+                            $subject = Subject::find($value);
+
+                            if (!$notice || !$subject) {
+                                return;
+                            }
+
+                            if ($notice->hasReachedMaxQuestionsForSubject($subject)) {
+                                $fail("A disciplina '{$subject->name}' já atingiu o limite de 5 questões neste edital.");
+                            }
+                        };
+                    })
                     ->label('Disciplina'),
                 Forms\Components\Textarea::make('statement')
                     ->required()
@@ -64,9 +85,8 @@ class QuestionResource extends Resource
                     ->options(function (callable $get) {
                         $options = $get('options') ?? [];
                         $choices = [];
-                        // Re-indexa com índices numéricos (0, 1, 2...) para evitar erro de string + int
                         foreach (array_values($options) as $i => $option) {
-                            $letter = chr(65 + $i); // A, B, C, D, E...
+                            $letter = chr(65 + $i);
                             $choices[$letter] = $letter . ' - ' . ($option['option'] ?? '');
                         }
                         return $choices;
